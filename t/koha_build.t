@@ -14,7 +14,8 @@ my $module = Test::MockModule->new('AnsbileTorpor');
 $module->mock('checkConfig', \&t::lib::Mock::AnsbileTorpor_checkConfig);
 
 my $t = Test::Mojo->new('AnsbileTorpor');
-$t->get_ok('/koha/build/koha_ci_1')->status_is(200)->content_like(qr/Ansible/i);
-
+$t->get_ok('/koha/build/koha_ci_1')->status_is(200) 
+                                  ->content_like(qr/Ansible/i)
+                                  ->content_like(qr/koha_ci_1/i);
 done_testing();
 

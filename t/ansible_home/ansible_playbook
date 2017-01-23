@@ -1,5 +1,8 @@
 #!/bin/bash
 
+echo "Somebody called me like this:"
+echo "$0 $@"
+echo ""
 echo "This script outputs Ansible-jargon for testing purposes"
 echo "More Ansible-jargon"
 echo ""

@@ -19,6 +19,8 @@ sub startup {
   my $config = $self->plugin(Config => {file => 'config/AnsbileTorpor.conf'});
   checkConfig($self, $config);
 
+  push @{$self->static->paths}, $config->{test_deliverables_dir};
+
   # Router
   my $r = $self->routes;
 
@@ -38,13 +40,15 @@ sub checkConfig {
   my ($self, $config) = (@_);
 
   my $prologue = "Configuration parameter ";
-  my @mandatoryConfig = (qw(ansible_home ansible_playbook_cmd));
+  my @mandatoryConfig = (qw(ansible_home ansible_playbook_cmd test_deliverables_dir));
   foreach my $mc (@mandatoryConfig) {
     die "$prologue '$mc' is not defined" unless ($config->{$mc});
   }
 
   warn "$prologue 'ansible_home' '$config->{ansible_home}' is not a directory?" unless ( -d $config->{ansible_home} );
-  warn "$prologue 'ansible_home' '$config->{ansible_home}' is not owned by current user '".getlogin()."'?" unless ( -o $config->{ansible_home} );
+  warn "$prologue 'ansible_home' '$config->{ansible_home}' is not readable by the current user '".getlogin()."'?" unless ( -r $config->{ansible_home} );
+  warn "$prologue 'test_deliverables_dir' '$config->{test_deliverables_dir}' is not a directory?" unless ( -d $config->{test_deliverables_dir} );
+  warn "$prologue 'test_deliverables_dir' '$config->{test_deliverables_dir}' is not readable by the current user '".getlogin()."'?" unless ( -r $config->{test_deliverables_dir} );
 }
 
 1;

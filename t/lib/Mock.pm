@@ -8,6 +8,7 @@ sub AnsbileTorpor_checkConfig {
   $config = $app->config();
   $config->{ansible_home} = 't/ansible_home';
   $config->{ansible_playbook_cmd} = './ansible_playbook';
+  $config->{test_deliverables_dir} = 't/ansible_home';
 }
 
 1;
