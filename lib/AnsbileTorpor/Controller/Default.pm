@@ -11,7 +11,7 @@ Render the main page
 
 sub index {
   my $self = shift;
-
+$DB::single=1;
   $self->reply->static('help.txt');
 }
 

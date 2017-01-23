@@ -17,15 +17,15 @@ sub startup {
   # Documentation browser under "/perldoc"
   $self->plugin('PODRenderer');
   my $config = $self->plugin(Config => {file => 'config/AnsbileTorpor.conf'});
-  checkConfig($config);
+  checkConfig($self, $config);
 
   # Router
   my $r = $self->routes;
 
   # Normal route to controller
-  $r->get('/')->to(controller => 'AnsbileTorpor::Controller::Default', action => 'index');
-  $r->get('/koha/build/:inventory_hostname')->to(controller => 'AnsbileTorpor::Controller::Koha', action => 'build');
-  $r->get('/koha/test/:inventory_hostname')->to(controller => 'AnsbileTorpor::Controller::Koha', action => 'test');
+  $r->get('/')->to('default#index');
+  $r->get('/koha/build/:inventory_hostname')->to('koha#build');
+  $r->get('/koha/test/:inventory_hostname')->to('koha#test');
 }
 
 =head2 checkConfig
@@ -35,16 +35,16 @@ Check that configuration options are properly given
 =cut
 
 sub checkConfig {
-  my ($config) = (@_);
+  my ($self, $config) = (@_);
 
   my $prologue = "Configuration parameter ";
-  my @mandatoryConfig = (qw(ansible_home));
+  my @mandatoryConfig = (qw(ansible_home ansible_playbook_cmd));
   foreach my $mc (@mandatoryConfig) {
     die "$prologue '$mc' is not defined" unless ($config->{$mc});
   }
 
-  die "$prologue 'ansible_home' '$config->{ansible_home}' is not a directory?" unless ( -d $config->{ansible_home} );
-  die "$prologue 'ansible_home' '$config->{ansible_home}' is not owned by current user '".getlogin()."'?" unless ( -o $config->{ansible_home} );
+  warn "$prologue 'ansible_home' '$config->{ansible_home}' is not a directory?" unless ( -d $config->{ansible_home} );
+  warn "$prologue 'ansible_home' '$config->{ansible_home}' is not owned by current user '".getlogin()."'?" unless ( -o $config->{ansible_home} );
 }
 
 1;

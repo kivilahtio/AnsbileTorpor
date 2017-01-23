@@ -21,6 +21,7 @@ sub build {
   my $self = shift;
   my $config = $self->config();
   my $ansible_home = $config->{ansible_home};
+  my $ansible_playbook_cmd = $config->{ansible_playbook_cmd};
 
   my $inventory_hostname = $self->param('inventory_hostname');
   unless ($allowed_inventory_hostnames{ $inventory_hostname }) {
@@ -28,7 +29,7 @@ sub build {
   }
 
   #Ansible scripts will propably take some time
-  my $ansbile_out = `cd $ansible_home && ansible-playbook -i production -l $inventory_hostname -l $lxc_host everything.playbook`;
+  my $ansbile_out = `cd $ansible_home && $ansible_playbook_cmd -i production -l $inventory_hostname -l $lxc_host everything.playbook`;
   my $ansbile_out_rv = ${^CHILD_ERROR_NATIVE};
 
   my $status = 200;
@@ -36,7 +37,7 @@ sub build {
   $self->render(status => $status, text => $ansbile_out);
 }
 
-=head2
+=head2 test
 
 Runs the Koha's test suite and gathers other code quality metrics.
 Tar's them up and sends them with the response.

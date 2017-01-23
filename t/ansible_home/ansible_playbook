@@ -1,0 +1,8 @@
+#!/bin/bash
+
+echo "This script outputs Ansible-jargon for testing purposes"
+echo "More Ansible-jargon"
+echo ""
+echo "ssh-connect -o progparams nobody has a clue about"
+echo "Done testing, nothing exploded"
+
