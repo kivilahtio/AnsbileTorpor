@@ -1,0 +1,5 @@
+.build
+*.swp
+/AnsbileTorpor-*
+/.build
+!META.json

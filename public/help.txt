@@ -1,0 +1,4 @@
+This small Mojolicious app triggers predetermined build and test runs from the
+Ansible central control server and relays build logs and test deliverables to
+the calling CI-server.
+
