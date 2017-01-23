@@ -15,7 +15,8 @@ $module->mock('checkConfig', \&t::lib::Mock::AnsbileTorpor_checkConfig);
 
 my $t = Test::Mojo->new('AnsbileTorpor');
 $t->get_ok('/koha/build/koha_ci_1')->status_is(200) 
-                                  ->content_like(qr/Ansible/i)
-                                  ->content_like(qr/koha_ci_1/i);
+                                  ->content_like(qr/Ansible/i, 'Ansible mentioned')
+                                  ->content_like(qr/koha_ci_1/i, '--limit koha_ci_1 passed to Ansible playbook')
+                                  ->content_like(qr/koha_ci_1/i, '--limit hephaestus passed to Ansible playbook');
 done_testing();
 
