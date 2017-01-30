@@ -5,6 +5,12 @@ use Mojo::Base 'Mojolicious';
 
 # ABSTRACT: A poor man's Ansible Tower
 
+=head1 NAME
+
+AnsbileTorpor
+
+=cut
+
 =head2 startup
 
 This method will run once at server start

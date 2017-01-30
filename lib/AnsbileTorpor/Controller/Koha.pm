@@ -3,12 +3,11 @@ use 5.22.0;
 package AnsbileTorpor::Controller::Koha;
 use Mojo::Base 'Mojolicious::Controller';
 
-my $lxc_host = 'hephaestus'; #Which LXC-Host provisions Koha CI containers
-my %allowed_inventory_hostnames = (
-  koha_ci_1 => 1,
-  koha_ci_2 => 1,
-  $lxc_host => 1, #lxc-host must be allowed so we can reprovision a LXC-container for CI-Koha when needed
-);
+=head1 NAME
+
+AnsbileTorpor::Controller::Koha
+
+=cut
 
 =head2 build
 
@@ -22,6 +21,8 @@ sub build {
   my $config = $self->config();
   my $ansible_home = $config->{ansible_home};
   my $ansible_playbook_cmd = $config->{ansible_playbook_cmd};
+  my $lxc_host = $config->{lxc_host};
+  my $allowed_inventory_hostnames = $config->{allowed_inventory_hostnames};
 
   my $inventory_hostname = $self->param('inventory_hostname');
   unless ($allowed_inventory_hostnames{ $inventory_hostname }) {
@@ -49,6 +50,7 @@ sub test {
   my $config = $self->config();
   my $ansible_home = $config->{ansible_home};
   my $ansible_playbook_cmd = $config->{ansible_playbook_cmd};
+  my $allowed_inventory_hostnames = $config->{allowed_inventory_hostnames};
 
   my $inventory_hostname = $self->param('inventory_hostname');
   unless ($allowed_inventory_hostnames{ $inventory_hostname }) {
@@ -67,7 +69,7 @@ sub test {
   }
 
   #Looks in the configured public directories for the test results archive
-  $self->reply->static("$inventory_hostname.tar.gz");
+  $self->reply->static("$inventory_hostname/testResults.tar.gz");
 }
 
 1;
