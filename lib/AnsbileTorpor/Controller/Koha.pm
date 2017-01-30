@@ -1,6 +1,7 @@
 use 5.22.0;
 
 package AnsbileTorpor::Controller::Koha;
+
 use Mojo::Base 'Mojolicious::Controller';
 
 =head1 NAME
@@ -25,8 +26,8 @@ sub build {
   my $allowed_inventory_hostnames = $config->{allowed_inventory_hostnames};
 
   my $inventory_hostname = $self->param('inventory_hostname');
-  unless ($allowed_inventory_hostnames{ $inventory_hostname }) {
-    $self->render({status => 403, text => "\$inventory_hostname '$inventory_hostname' not in the allowed inventory hostnames list '".@{%allowed_inventory_hostnames}."'"});
+  unless ($allowed_inventory_hostnames->{ $inventory_hostname }) {
+    $self->render({status => 403, text => "\$inventory_hostname '$inventory_hostname' not in the allowed inventory hostnames list '".@{%$allowed_inventory_hostnames}."'"});
   }
 
   #Ansible scripts will propably take some time
@@ -53,8 +54,8 @@ sub test {
   my $allowed_inventory_hostnames = $config->{allowed_inventory_hostnames};
 
   my $inventory_hostname = $self->param('inventory_hostname');
-  unless ($allowed_inventory_hostnames{ $inventory_hostname }) {
-    $self->render({status => 403, text => "\$inventory_hostname '$inventory_hostname' not in the allowed inventory hostnames list '".@{%allowed_inventory_hostnames}."'"});
+  unless ($allowed_inventory_hostnames->{ $inventory_hostname }) {
+    $self->render({status => 403, text => "\$inventory_hostname '$inventory_hostname' not in the allowed inventory hostnames list '".@{%$allowed_inventory_hostnames}."'"});
   }
 
   #Ansible scripts will propably take some time

@@ -1,6 +1,7 @@
 use 5.22.0;
 
 package AnsbileTorpor::Controller::Default;
+
 use Mojo::Base 'Mojolicious::Controller';
 
 =head1 NAME

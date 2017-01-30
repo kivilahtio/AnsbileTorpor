@@ -1,6 +1,7 @@
 use 5.22.0;
 
 package AnsbileTorpor;
+
 use Mojo::Base 'Mojolicious';
 
 # ABSTRACT: A poor man's Ansible Tower
