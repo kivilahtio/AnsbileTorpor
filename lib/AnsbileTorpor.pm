@@ -23,7 +23,14 @@ sub startup {
 
   # Documentation browser under "/perldoc"
   $self->plugin('PODRenderer');
-  my $config = $self->plugin(Config => {file => 'config/AnsbileTorpor.conf'});
+
+  my $config;
+  if (-e '/etc/ansbiletorpor/AnsbileTorpor.conf') {
+    $config = $self->plugin(Config => {file => '/etc/ansbiletorpor/AnsbileTorpor.conf'});
+  }
+  else {
+    $config = $self->plugin(Config => {file => 'config/AnsbileTorpor.conf'});
+  }
   checkConfig($self, $config);
 
   push @{$self->static->paths}, $config->{test_deliverables_dir};

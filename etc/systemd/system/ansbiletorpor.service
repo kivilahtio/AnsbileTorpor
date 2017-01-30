@@ -1,0 +1,15 @@
+[Unit]
+Description=A poor man's Ansible Tower
+
+[Service]
+Type=simple
+User=ansible
+ExecStart=/home/ansible/AnsbileTorpor/scripts/ansbile_torpor daemon -m development -l http://*:81
+
+RestartSec=5s
+Restart=always
+
+PrivateTmp=yes
+
+[Install]
+WantedBy=multi-user.target
