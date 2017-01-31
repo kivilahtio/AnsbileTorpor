@@ -52,14 +52,14 @@ sub build {
   }
 }
 
-=head2 test
+=head2 alltest
 
 Runs the Koha's big test suite and gathers other code quality metrics.
 Tar's them up and sends them with the response.
 
 =cut
 
-sub test {
+sub alltest {
   my $self = shift;
   my $testSuite = 'all';
   _handleTest($self, $testSuite);
