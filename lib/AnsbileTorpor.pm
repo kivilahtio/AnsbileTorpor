@@ -42,6 +42,7 @@ sub startup {
   $r->get('/')->to('default#index');
   $r->get('/koha/build/:inventory_hostname')->to('koha#build');
   $r->get('/koha/test/:inventory_hostname')->to('koha#test');
+  $r->get('/koha/gittest/:inventory_hostname')->to('koha#gittest');
 }
 
 =head2 checkConfig
