@@ -4,7 +4,7 @@ Description=A poor man's Ansible Tower
 [Service]
 Type=simple
 User=ansible
-ExecStart=/home/ansible/AnsbileTorpor/script/ansbile_torpor daemon -m development -l http://*:8080
+ExecStart=/home/ansible/AnsbileTorpor/script/ansbile_torpor daemon -m development -l http://*:8080 --inactivity-timeout 36000
 
 RestartSec=5s
 Restart=always
