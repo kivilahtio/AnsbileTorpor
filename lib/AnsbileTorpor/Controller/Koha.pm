@@ -38,7 +38,7 @@ sub build {
     _checkAllowedInventoryHostname($self, $config, $inventory_hostname);
 
     #Ansible scripts will propably take some time
-    $output = `cd $ansible_home && $ansible_playbook_cmd -i production -l "$inventory_hostname $lxc_host" everything.playbook 2>&1`;
+    $output = `cd $ansible_home && $ansible_playbook_cmd -i production.inventory -l "$inventory_hostname $lxc_host" -e "target=$inventory_hostname" everything.playbook 2>&1`;
     my $ansbile_out_rv = ${^CHILD_ERROR_NATIVE};
 
     $status = 500 if $ansbile_out_rv;
@@ -99,7 +99,7 @@ sub _handleTest {
     _checkAllowedInventoryHostname($c, $config, $inventory_hostname);
 
     #Ansible scripts will propably take some time
-    $output = `cd $ansible_home && $ansible_playbook_cmd -i production -l $inventory_hostname -e koha_run_${testSuite}_tests=true application_koha.playbook 2>&1`;
+    $output = `cd $ansible_home && $ansible_playbook_cmd -i production.inventory -l $inventory_hostname -e koha_run_${testSuite}_tests=true application_koha.playbook 2>&1`;
     my $ansbile_out_rv = ${^CHILD_ERROR_NATIVE};
 
     if ($ansbile_out_rv) {
