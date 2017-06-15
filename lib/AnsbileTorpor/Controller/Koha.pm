@@ -16,6 +16,7 @@ $Carp::Verbose = 'true'; #die with stack trace
 
 use AnsbileTorpor;
 
+use IPC::Cmd;
 
 =head2 build
 
@@ -25,30 +26,34 @@ Building, reconfiguring and upgrading changes or even rebuilding the complete in
 =cut
 
 sub build {
-  my $self = shift;
+  my $c = shift;
   my $status = 200;
-  my $output;
+  my ($cmd, $success, $error_message, $full_buf, $stdout_buf, $stderr_buf);
   eval {
-    my $config = $self->config();
+    my $config = $c->config();
     my $ansible_home = $config->{ansible_home};
     my $ansible_playbook_cmd = $config->{ansible_playbook_cmd};
     my $lxc_host = $config->{lxc_host};
-    my $inventory_hostname = $self->param('inventory_hostname');
+    my $inventory_hostname = $c->param('inventory_hostname');
 
-    _checkAllowedInventoryHostname($self, $config, $inventory_hostname);
+    _checkAllowedInventoryHostname($c, $config, $inventory_hostname);
 
     #Ansible scripts will propably take some time
-    $output = `cd $ansible_home && $ansible_playbook_cmd -i production.inventory -l "$inventory_hostname $lxc_host" -e "target=$inventory_hostname" everything.playbook 2>&1`;
+    $cmd = "cd $ansible_home && $ansible_playbook_cmd -i production.inventory -l '$inventory_hostname,$lxc_host'  -e 'target=$inventory_hostname' everything.playbook";
+    $c->app->log->warn('ANSIBLE CMD:'.$cmd);
+
+    ( $success, $error_message, $full_buf, $stdout_buf, $stderr_buf ) =
+            IPC::Cmd::run( command => $cmd, verbose => 0 );
     my $ansbile_out_rv = ${^CHILD_ERROR_NATIVE};
 
-    $status = 500 if $ansbile_out_rv;
+    $status = 500 if $ansbile_out_rv || not($success);
   };
   if ($@) {
-    return $self->render(status => 403, text => $@) if $@ =~ /not in the allowed inventory/;
-    return $self->render(status => 500, text => $@); #Hopefully with a good stack trace
+    return $c->render(status => 403, text => $@) if $@ =~ /not in the allowed inventory/;
+    return $c->render(status => 500, text => $@); #Hopefully with a good stack trace
   }
   else {
-    return $self->render(status => $status, text => $output);
+    return $c->render(status => $status, text => "ANSIBLE COMMAND:\n$cmd\nSTDOUT\n".join("\n", @$stdout_buf)."\nSTDERR:\n".join("\n",@$stderr_buf));
   }
 }
 
@@ -60,9 +65,9 @@ Tar's them up and sends them with the response.
 =cut
 
 sub alltest {
-  my $self = shift;
+  my $c = shift;
   my $testSuite = 'all';
-  _handleTest($self, $testSuite);
+  _handleTest($c, $testSuite);
 }
 
 =head2 gittest
@@ -73,9 +78,9 @@ Tar's them up and sends back with the response.
 =cut
 
 sub gittest {
-  my $self = shift;
+  my $c = shift;
   my $testSuite = 'git';
-  _handleTest($self, $testSuite);
+  _handleTest($c, $testSuite);
 }
 
 =head2 _handleTest
@@ -89,7 +94,7 @@ $testSuite is one of the test suite parameters Koha/ks-test-harness.pl receives
 sub _handleTest {
   my ($c, $testSuite) = @_;
   my $status = 200;
-  my $output;
+  my ($cmd, $success, $error_message, $full_buf, $stdout_buf, $stderr_buf);
   my $inventory_hostname = $c->param('inventory_hostname');
   eval {
     my $config = $c->config();
@@ -99,11 +104,15 @@ sub _handleTest {
     _checkAllowedInventoryHostname($c, $config, $inventory_hostname);
 
     #Ansible scripts will propably take some time
-    $output = `cd $ansible_home && $ansible_playbook_cmd -i production.inventory -l $inventory_hostname -e koha_run_${testSuite}_tests=true application_koha.playbook 2>&1`;
+    $cmd = "cd $ansible_home && $ansible_playbook_cmd -i production.inventory -l $inventory_hostname -e koha_run_tests=true -e koha_run_${testSuite}_tests=true application_koha.playbook";
+    $c->app->log->warn('ANSIBLE CMD:'.$cmd);
+
+    ( $success, $error_message, $full_buf, $stdout_buf, $stderr_buf ) =
+            IPC::Cmd::run( command => $cmd, verbose => 0 );
     my $ansbile_out_rv = ${^CHILD_ERROR_NATIVE};
 
-    if ($ansbile_out_rv) {
-      die $output;
+    if ($ansbile_out_rv || not($success)) {
+      die "ERROR:\n$error_message\nOUTPUT(STDOUT/STDERR)\n".join("\n",@$full_buf);
     }
   };
   if ($@) {
@@ -111,8 +120,11 @@ sub _handleTest {
     return $c->render(status => 500, text => $@); #Hopefully with a good stack trace
   }
   else {
-    #Looks in the configured public directories for the test results archive
-    return $c->reply->static("$inventory_hostname/testResults.tar.gz");
+    return $c->render(status => $status, text => "ANSIBLE COMMAND:\n$cmd\nSTDOUT\n".join("\n", @$stdout_buf)."\nSTDERR:\n".join("\n",@$stderr_buf));
+
+    #Ansible should put the test deliverables to /home/ansible/public/$inventory_hostname/testResults.tar.gz
+    #User must download them afterwards with curl http://0.0.0.0/$inventory_hostname/testResults.tar.gz
+    #return $c->reply->static("$inventory_hostname/testResults.tar.gz");
   }
 }
 

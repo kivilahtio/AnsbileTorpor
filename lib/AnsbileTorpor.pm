@@ -33,7 +33,18 @@ sub startup {
   }
   checkConfig($self, $config);
 
-  push @{$self->static->paths}, $config->{test_deliverables_dir};
+  unless (getpwuid($<) eq 'ansible') {
+    die "AnsbileTorpor must be ran as the 'ansible'-user!";
+  }
+
+#  push @{$self->static->paths}, $config->{test_deliverables_dir}; #This didn't work.
+  $self->static->paths->[1] = $config->{test_deliverables_dir};
+
+  my $log = Mojo::Log->new(
+                           level => 'debug',
+#                           path  => '/tmp/mojo.log',
+                          );
+  $self->log($log);
 
   # Router
   my $r = $self->routes;
