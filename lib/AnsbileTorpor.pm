@@ -159,7 +159,9 @@ sub dispatchAnsiblePlaybook {
 
   my ( $success, $errorMessage, $fullBuf, $stdoutBuf, $stderrBuf ) =
           IPC::Cmd::run( command => $cmd, verbose => 0 );
-  my $exitValue = ${^CHILD_ERROR_NATIVE};
+  my $exitValue = ${^CHILD_ERROR_NATIVE} >> 8;
+  my $killSignal = ${^CHILD_ERROR_NATIVE} & 127;
+  my $coreDumpTriggered = ${^CHILD_ERROR_NATIVE} & 128;
 
   return ($exitValue, $errorMessage, $fullBuf, $stdoutBuf, $stderrBuf, $cmd);
 }
