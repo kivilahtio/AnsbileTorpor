@@ -1,6 +1,7 @@
 use 5.22.0;
 
 $ENV{MOJO_TESTING} = "1";
+#$ENV{MOJO_LOG_LEVEL} = 'debug';
 
 use Mojo::Base -strict;
 
@@ -20,7 +21,7 @@ subtest "/deploy/hetula_production is not an allowed inventory_hostname", sub {
   $t->get_ok('/deploy/hetula_production')
     ->status_is(403)
     ->content_like(qr/hetula_production/i, 'Unauthorized inventory_hostname mentioned')
-    ->content_like(qr/not in the allowed inventory/i, 'Description of the error received');
+    ->content_like(qr/Forbidden inventory_hostname 'hetula_production' for action 'deploy'/i, 'Description of the error received');
 
   #print $t->tx->res->body();
 };
@@ -60,12 +61,11 @@ subtest "/deploy/hetula_ci is misconfigured", sub {
   my $module = Test::MockModule->new('AnsbileTorpor');
   $module->mock('_preCheckConfigHook', \&t::lib::Mock::AnsbileTorpor_checkConfigFaulty);
 
-  my $t = Test::Mojo->new('AnsbileTorpor');
-  $t->get_ok('/deploy/hetula_ci')
-    ->status_is(500)
-    ->content_like(qr!sh: 1: ./ansbille_plybk: not found!, 'Mangled ansible-playbook command not found');
-
-  #print $t->tx->res->body();
+  eval {
+    my $t = Test::Mojo->new('AnsbileTorpor');
+    ok(0, "Test::Mojo->new() should die due to bad configuration??");
+  };
+  like($@, qr/Dying because of '\d+' errors/, "App died due to configuration errors");
 };
 
 
