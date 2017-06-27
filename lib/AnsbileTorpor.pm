@@ -1,5 +1,7 @@
 use 5.22.0;
 
+use Modern::Perl;
+
 package AnsbileTorpor;
 
 use Mojo::Base 'Mojolicious';
@@ -25,15 +27,15 @@ sub startup {
   $self->plugin('PODRenderer');
 
   my $config;
-  if (-e '/etc/ansbiletorpor/AnsbileTorpor.conf') {
+  if (not($ENV{MOJO_TESTING}) && -e '/etc/ansbiletorpor/AnsbileTorpor.conf') {
     $config = $self->plugin(Config => {file => '/etc/ansbiletorpor/AnsbileTorpor.conf'});
   }
   else {
     $config = $self->plugin(Config => {file => 'config/AnsbileTorpor.conf'});
   }
-  checkConfig($self, $config);
+  $self->checkConfig($config);
 
-  unless (getpwuid($<) eq 'ansible') {
+  if (not(getpwuid($<) eq 'ansible') && not($ENV{MOJO_TESTING})) {
     die "AnsbileTorpor must be ran as the 'ansible'-user!";
   }
 
@@ -54,6 +56,7 @@ sub startup {
   $r->get('/koha/build/:inventory_hostname')->to('koha#build');
   $r->get('/koha/alltest/:inventory_hostname')->to('koha#alltest');
   $r->get('/koha/gittest/:inventory_hostname')->to('koha#gittest');
+  $r->get('/deploy/:inventory_hostname')->to('deploy#any');
 }
 
 =head2 checkConfig
@@ -63,7 +66,9 @@ Check that configuration options are properly given
 =cut
 
 sub checkConfig {
-  my ($self, $config) = (@_);
+  my ($self, $config) = @_;
+  _preCheckConfigHook($self, $config);
+
 
   my $prologue = "Configuration parameter ";
   my @mandatoryConfig = (qw(ansible_home ansible_playbook_cmd test_deliverables_dir));
@@ -75,6 +80,17 @@ sub checkConfig {
   warn "$prologue 'ansible_home' '$config->{ansible_home}' is not readable by the current user '".getlogin()."'?" unless ( -r $config->{ansible_home} );
   warn "$prologue 'test_deliverables_dir' '$config->{test_deliverables_dir}' is not a directory?" unless ( -d $config->{test_deliverables_dir} );
   warn "$prologue 'test_deliverables_dir' '$config->{test_deliverables_dir}' is not readable by the current user '".getlogin()."'?" unless ( -r $config->{test_deliverables_dir} );
+}
+
+=head2 _preCheckConfigHook
+
+Allow hooking in from Test::MockModule and injecting test context
+
+=cut
+
+sub _preCheckConfigHook {
+  my ($self, $config) = @_;
+  return "Overload me";
 }
 
 1;

@@ -53,7 +53,7 @@ sub build {
     return $c->render(status => 500, text => $@); #Hopefully with a good stack trace
   }
   else {
-    return $c->render(status => $status, text => "ANSIBLE COMMAND:\n$cmd\nSTDOUT\n".join("\n", @$stdout_buf)."\nSTDERR:\n".join("\n",@$stderr_buf));
+    return $c->render(status => $status, text => "ANSIBLE COMMAND:\n$cmd\nSTDOUT:\n".join("\n", @$stdout_buf)."\nSTDERR:\n".join("\n",@$stderr_buf));
   }
 }
 
@@ -120,7 +120,7 @@ sub _handleTest {
     return $c->render(status => 500, text => $@); #Hopefully with a good stack trace
   }
   else {
-    return $c->render(status => $status, text => "ANSIBLE COMMAND:\n$cmd\nSTDOUT\n".join("\n", @$stdout_buf)."\nSTDERR:\n".join("\n",@$stderr_buf));
+    return $c->render(status => $status, text => "ANSIBLE COMMAND:\n$cmd\nSTDOUT:\n".join("\n", @$stdout_buf)."\nSTDERR:\n".join("\n",@$stderr_buf));
 
     #Ansible should put the test deliverables to /home/ansible/public/$inventory_hostname/testResults.tar.gz
     #User must download them afterwards with curl http://0.0.0.0/$inventory_hostname/testResults.tar.gz
