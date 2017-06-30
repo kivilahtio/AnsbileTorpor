@@ -70,6 +70,7 @@ Check that configuration options are properly given
 
 sub checkConfig {
   my ($self, $config) = @_;
+  $self->log->info("Checking config and validating Ansible playbook commands. This might take a minute or so.");
   _preCheckConfigHook($self, $config);
 
 
