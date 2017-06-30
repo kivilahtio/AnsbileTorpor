@@ -58,11 +58,8 @@ sub startup {
   my $r = $self->routes;
 
   # Normal route to controller
+  $r->get('/:req_action/:inventory_hostname')->to('deploy#any');
   $r->get('/')->to('default#index');
-  $r->get('/koha/build/:inventory_hostname')->to('koha#build');
-  $r->get('/koha/alltest/:inventory_hostname')->to('koha#alltest');
-  $r->get('/koha/gittest/:inventory_hostname')->to('koha#gittest');
-  $r->get('/deploy/:inventory_hostname')->to('deploy#any');
 }
 
 =head2 checkConfig

@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html>
+  <head><title>Not found</title></head>
+  <body>
+    <h1>Exception</h1>
+    <p><%= $exception->message %></p>
+    <h1>Stash</h1>
+    <pre><%= dumper $snapshot %></pre>
+  </body>
+</html>

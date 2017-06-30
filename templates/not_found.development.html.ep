@@ -1,0 +1,8 @@
+<!DOCTYPE html>
+<html>
+  <head><title>Not found</title></head>
+  <body>
+    <h1>Stash</h1>
+    <pre><%= dumper $snapshot %></pre>
+  </body>
+</html>

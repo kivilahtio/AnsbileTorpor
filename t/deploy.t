@@ -1,6 +1,8 @@
 use 5.22.0;
 
 $ENV{MOJO_TESTING} = "1";
+$ENV{MOJO_MODE} = 'development';
+$ENV{MOJO_INACTIVITY_TIMEOUT} = 0; #When debugging it is usefull to not timeout the request
 #$ENV{MOJO_LOG_LEVEL} = 'debug';
 
 use Mojo::Base -strict;
@@ -18,7 +20,7 @@ subtest "/deploy/hetula_production is not an allowed inventory_hostname", sub {
   $module->mock('_preCheckConfigHook', \&t::lib::Mock::AnsbileTorpor_checkConfig);
 
   my $t = Test::Mojo->new('AnsbileTorpor');
-  $t->get_ok('/deploy/hetula_production')
+  $t->get_ok('/deploy/hetula_production' => {Accept => 'text/plain'})
     ->status_is(403)
     ->content_like(qr/hetula_production/i, 'Unauthorized inventory_hostname mentioned')
     ->content_like(qr/Forbidden inventory_hostname 'hetula_production' for action 'deploy'/i, 'Description of the error received');
